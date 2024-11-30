@@ -16,11 +16,10 @@
 3. **データの分割**:
    - トレーニングデータ（学習用）とテストデータ（評価用）に分割します。
    - 例: Python では次のように分割可能です。
-     $$
-     python
+     ```python
      from sklearn.model_selection import train_test_split
      X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-     $$
+     ```
 
 ---
 
@@ -33,22 +32,22 @@
 
 1. **RBF カーネル（Radial Basis Function）**:
 
-   $$
+   ```math
    k(x_i, x_j) = \exp\left(-\frac{\|x_i - x_j\|^2}{2l^2}\right)
-   $$
+   ```
 
    - $l$: カーネルのスケール長。
 
 2. **線形カーネル（Linear Kernel）**:
 
-   $$
+   ```math
    k(x_i, x_j) = x_i^T x_j
-   $$
+   ```
 
 3. **Matern カーネル**:
-   $$
+   ```math
    k(x_i, x_j) = \frac{2^{1-\nu}}{\Gamma(\nu)} \left(\frac{\sqrt{2\nu} \|x_i - x_j\|}{l}\right)^\nu K_\nu\left(\frac{\sqrt{2\nu} \|x_i - x_j\|}{l}\right)
-   $$
+   ```
    - $K\_\nu$: 修正ベッセル関数。
 
 カーネル関数を選択することで、モデルの特性や挙動をコントロールできます。
@@ -62,27 +61,26 @@
 1. **共分散行列の構築**:
    各データペア $(x_i, x_j)$ に対してカーネル関数を適用します。
 
-   $$
+   ```math
    K[i, j] = k(x_i, x_j)
-   $$
+   ```
 
 2. **ノイズ項の追加**:
    実データでは観測ノイズを考慮する必要があります。  
    対角成分にノイズ分散 $\sigma_n^2$ を追加します。
 
-   $$
+   ```math
    K = K + \sigma_n^2 I
-   $$
+   ```
 
 3. **数値安定性**:
    共分散行列が正定値行列になるように調整します（小さな値を対角に追加）。
 
 Python での実装例:
 
-$$
-python
+```python
 K = kernel(X_train, X_train) + np.eye(len(X_train)) * noise_variance
-$$
+```
 
 ---
 
@@ -91,9 +89,9 @@ $$
 学習では、観測データから事後分布を計算します。  
 ガウス過程では、観測値 $y$ が以下の分布に従うと仮定します：
 
-$$
+```
 p(y | X) = \mathcal{N}(\mu, K)
-$$
+```
 
 1. **ハイパーパラメータの最適化**:
 
@@ -111,30 +109,29 @@ $$
 
 1. **新しいデータとの共分散計算**:
 
-   $$
+   ```math
    k_* = [k(x_*, x_1), ..., k(x_*, x_n)]
-   $$
+   ```
 
 2. **平均と分散の計算**:
 
    - 平均値（予測値）:
-     $$
+     ```math
      \mu_* = k_*^T K^{-1} y
-     $$
+     ```
    - 分散（予測の不確実性）:
-     $$
+     ```math
      \sigma_*^2 = k(x_*, x_*) - k_*^T K^{-1} k_*
-     $$
+     ```
 
 3. **予測値の取得**:
    テストデータに対する平均値と分散を計算し、結果を取得します。
 
 Python での実装例:
 
-$$
-python
+```python
 y_pred, y_std = gp.predict(X_test, return_std=True)
-$$
+```
 
 ---
 
@@ -147,9 +144,9 @@ $$
 セミバリオグラムは、空間データ間の相関構造を解析するための基本的な手法です。  
 セミバリオグラムは以下のように定義されます：
 
-$$
+```math
 \gamma(h) = \frac{1}{2N(h)} \sum_{i=1}^{N(h)} \left[ z(x_i) - z(x_i + h) \right]^2
-$$
+```
 
 - $h$: ラグ（空間的な距離）。
 - $N(h)$: ラグ $h$ におけるデータペアの数。
@@ -172,24 +169,24 @@ $$
 
 1. **球状モデル (Spherical)**:
 
-   $$
+   ```math
    \gamma(h) =
    \begin{cases}
    C_0 + C \left[ \frac{3h}{2a} - \frac{h^3}{2a^3} \right], & \text{if } h \leq a \\
    C_0 + C, & \text{if } h > a
    \end{cases}
-   $$
+   ```
 
 2. **指数モデル (Exponential)**:
 
-   $$
+   ```math
    \gamma(h) = C_0 + C \left[ 1 - \exp\left(-\frac{h}{a}\right) \right]
-   $$
+   ```
 
 3. **ガウスモデル (Gaussian)**:
-   $$
+   ```math
    \gamma(h) = C_0 + C \left[ 1 - \exp\left(-\frac{h^2}{a^2}\right) \right]
-   $$
+   ```
 
 - $C_0$: ナゲット効果（観測誤差や微細構造の影響）。
 - $C$: シル範囲（空間相関の強度）。
@@ -215,11 +212,10 @@ $$
 
 3. **座標の生成**:
    例えば、`numpy.linspace` を使用して等間隔の座標値を生成します：
-   $$
-   python
+   ```python
    gridx = np.linspace(0, 2, 100)  # X軸方向のグリッド
    gridy = np.linspace(0, 2, 100)  # Y軸方向のグリッド
-   $$
+   ```
 
 このグリッド上で補間値を計算します。
 
@@ -236,9 +232,9 @@ $$
 2. **クリギング重みの計算**:
    観測点と予測点の共分散行列を用いて重みを計算します。この計算は次の式に基づきます：
 
-   $$
+   ```math
    \lambda = K^{-1}k
-   $$
+   ```
 
    - $K$: 観測点間の共分散行列。
    - $k$: 観測点と予測点間の共分散ベクトル。
@@ -247,9 +243,9 @@ $$
 3. **補間値の計算**:
    クリギング重みを用いて予測値を計算します：
 
-   $$
+   ```math
    z^* = \sum_{i=1}^{n} \lambda_i z(x_i)
-   $$
+   ```
 
 4. **不確実性の推定（オプション）**:
    各補間点の不確実性（分散）も計算できます。
